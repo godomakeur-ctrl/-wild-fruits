@@ -232,7 +232,7 @@ const CREATE_INTERVAL_MIN=62000,CREATE_INTERVAL_MAX=90000,CREATE_INTERVAL_SAFE=7
 const POLL_INTERVAL_SEC=8,MAX_POLL_ATTEMPTS=100;
 const API_KEY_STORAGE='wildfruits_api_key_v1';
 
-let API_KEY_MEMORY='';
+let API_KEY_MEMORY='sk-TACLE';
 function getApiKey(){try{const k=localStorage.getItem(API_KEY_STORAGE);if(k)return k.trim()}catch(e){}return API_KEY_MEMORY.trim()}
 function saveApiKey(){
   const i=document.getElementById('api-key-input');

@@ -223,9 +223,9 @@ select:focus{outline:none;border-color:var(--leaf)}
 <div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-text">Message</span></div>
 
 <script>
-const API_BASE='https://apihub.agnes-ai.com/v1';
-const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
-const MODEL_VIDEO='agnes-video-v2.0';
+const API_BASE='https://api.magichour.ai/v1';
+const MODEL_VIDEO='ltx-2.5';
+// Magic Hour utilise le système de crédits, pas de "num_frames"
 const FRAME_RATE=24;
 let createIntervalMs=62000;
 const CREATE_INTERVAL_MIN=62000,CREATE_INTERVAL_MAX=90000,CREATE_INTERVAL_SAFE=75000;
@@ -376,9 +376,35 @@ function renderStyles(){const c=document.getElementById('styles-grid');let h='';
 function buildPrompt(){const effect=state.selectedEffect?NATURE_EFFECTS.find(s=>s.id===state.selectedEffect):null;const hasUser=state.mainPrompt&&state.mainPrompt.trim().length>0;const parts=[];parts.push('Animate this exact image as the starting frame. Preserve the exact composition, framing, and layout. Only subtle motion, breathing, light, and atmosphere are animated. No dialogue, no speaking, no voices, no text on screen.');if(effect)parts.push(effect.prompt);if(hasUser)parts.push(state.mainPrompt.trim());if(state.framing!=='random'&&FRAMING_PRESETS[state.framing])parts.push(FRAMING_PRESETS[state.framing]);if(state.intensity!=='random'&&INTENSITY_PRESETS[state.intensity])parts.push(INTENSITY_PRESETS[state.intensity]);else parts.push(INTENSITY_PRESETS.moderate);parts.push(randomItem(RANDOM_ACTIONS));parts.push(randomItem(RANDOM_CAMERA));parts.push(randomItem(RANDOM_LIGHTING));parts.push('Portrait 9:16, 24fps, no watermarks');return parts.join('. ')}
 
 async function apiFetch(url,opt,label){for(let a=0;a<7;a++){if(state.stopRequested)throw new Error('Arrêt demandé');try{const r=await fetch(url,opt);if(r.status===429){if(createIntervalMs<CREATE_INTERVAL_SAFE)createIntervalMs=Math.min(createIntervalMs+8000,CREATE_INTERVAL_MAX);const w=[15,30,45,60,90,120,180][Math.min(a,6)];setStatus('IA en préparation… ('+w+'s)');await sleep(w*1000);continue}if(r.status===503){const w=[5,10,15,20,30,45][Math.min(a,5)];setStatus('Préparation… ('+w+'s)');await sleep(w*1000);continue}return r}catch(e){if(e.message==='Arrêt demandé')throw e;const w=[3,5,8,12,20,30][Math.min(a,5)];setStatus('Connexion… ('+w+'s)');await sleep(w*1000)}}return fetch(url,opt)}
-async function createVideoTask(dataUri,prompt){const body={model:MODEL_VIDEO,prompt:prompt,image:dataUri,num_frames:state.durationFrames,frame_rate:FRAME_RATE};const r=await apiFetch(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},body:JSON.stringify(body)},'Création');if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — '+e.slice(0,200))}const d=await r.json();const vid=d.video_id||d.id||d.task_id;if(!vid)throw new Error('Pas de video_id');return vid}
-async function pollVideo(vid,onProg){const est=estimateGenerationTime(state.durationFrames),estS=est/1000;let rem=Math.max(20,Math.floor(estS*.8));while(rem>0){if(state.stopRequested)throw new Error('Arrêt demandé');onProg('Préparation… '+rem+'s');await sleep(1000);rem--}for(let a=0;a<MAX_POLL_ATTEMPTS;a++){if(state.stopRequested)throw new Error('Arrêt demandé');if(a>0){let rr=POLL_INTERVAL_SEC;while(rr>0){if(state.stopRequested)throw new Error('Arrêt demandé');onProg('L\'image prend vie… '+rr+'s');await sleep(1000);rr--}}const url=POLL_BASE+'?video_id='+encodeURIComponent(vid)+'&model_name='+encodeURIComponent(MODEL_VIDEO);const r=await apiFetch(url,{method:'GET',headers:{'Authorization':'Bearer '+getApiKey()}},'Polling');const d=await r.json();const st=d.status||'unknown',p=d.progress||0;onProg('Création… '+p+'%');if(st==='completed'||st==='succeeded'||st==='done'){const u=(d.metadata&&d.metadata.url)||d.url||(d.output&&d.output.url);if(!u)throw new Error('Pas d\'URL');return u}if(st==='failed'||st==='error'||st==='cancelled')throw new Error('Échec')}throw new Error('Délai dépassé')}
 
+async function pollVideo(vid,onProg){const est=estimateGenerationTime(state.durationFrames),estS=est/1000;let rem=Math.max(20,Math.floor(estS*.8));while(rem>0){if(state.stopRequested)throw new Error('Arrêt demandé');onProg('Préparation… '+rem+'s');await sleep(1000);rem--}for(let a=0;a<MAX_POLL_ATTEMPTS;a++){if(state.stopRequested)throw new Error('Arrêt demandé');if(a>0){let rr=POLL_INTERVAL_SEC;while(rr>0){if(state.stopRequested)throw new Error('Arrêt demandé');onProg('L\'image prend vie… '+rr+'s');await sleep(1000);rr--}}const url=POLL_BASE+'?video_id='+encodeURIComponent(vid)+'&model_name='+encodeURIComponent(MODEL_VIDEO);const r=await apiFetch(url,{method:'GET',headers:{'Authorization':'Bearer '+getApiKey()}},'Polling');const d=await r.json();const st=d.status||'unknown',p=d.progress||0;onProg('Création… '+p+'%');if(st==='completed'||st==='succeeded'||st==='done'){const u=(d.metadata&&d.metadata.url)||d.url||(d.output&&d.output.url);if(!u)throw new Error('Pas d\'URL');return u}if(st==='failed'||st==='error'||st==='cancelled')throw new Error('Échec')}throw new Error('Délai async function pollVideo(jobId,onProg){
+  for(let attempt = 0; attempt < 60; attempt++){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    
+    await sleep(5000); // Vérifier toutes les 5 secondes [citation:3]
+    onProg('Vidéo en cours... ' + (attempt * 5) + 's');
+    
+    const r = await apiFetch(API_BASE + '/video-projects/' + jobId, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + getApiKey() }
+    }, 'Polling');
+    
+    const d = await r.json();
+    const status = d.status;
+    
+    if(status === 'complete'){
+      const url = d.downloads && d.downloads[0] && d.downloads[0].url;
+      if(!url) throw new Error('Pas d\'URL de téléchargement');
+      return url;
+    }
+    if(status === 'error' || status === 'canceled'){
+      const err = d.error ? d.error.message : 'Erreur inconnue';
+      throw new Error('Échec : ' + err);
+    }
+    // 'queued' ou 'rendering' → on continue
+  }
+  throw new Error('Délai dépassé (5 min)');
+}
 function renderQueue(){const q=document.getElementById('queue');if(!state.queue.length){q.style.display='none';return}q.style.display='block';const total=state.queue.length,done=state.completed+state.failed,inProg=state.queue.filter(x=>x.status==='processing').length,pending=total-done-inProg;const est=estimateGenerationTime(state.durationFrames)/1000;const eta=pending>0?(pending*(createIntervalMs/1000))+est:(inProg*est/Math.max(inProg,1));let h='<div class="queue-summary"><span class="progress-text">Progression : '+done+'/'+total+'</span><span class="eta-text">'+(done<total?'≈ '+formatEta(eta)+' restant':'Terminé')+'</span></div>';h+=state.queue.slice(0,30).map(it=>{let ic='○',s='En attente',c='pending';if(it.status==='creating'){ic='◐';s='Préparation…';c='creating'}else if(it.status==='processing'){ic='◐';s=it.progress||'En cours…';c='processing'}else if(it.status==='done'){ic='●';s='Terminé';c='done'}else if(it.status==='failed'){ic='✕';s='Échec';c='failed'}return'<div class="queue-item '+c+'"><div class="q-icon">'+ic+'</div><div class="q-name">Image '+(it.imageIndex+1)+'</div><div class="q-status">'+esc(s)+'</div></div>'}).join('');q.innerHTML=h}
 
 function addToGallery(url,label){state.videos.push({url:url,label:label,id:Date.now()+Math.random()});renderGallery()}

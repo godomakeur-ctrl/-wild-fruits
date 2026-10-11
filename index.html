@@ -500,7 +500,7 @@ async function createVideoTask(dataUri, prompt) {
       image_file_path: filePath
     },
     end_seconds: state.durationSec,
-    model: MODEL_VIDEO,
+    model: 'ltx-2.5',
     resolution: '480p',
     name: 'Wild Fruits - ' + Date.now()
   };
@@ -523,28 +523,6 @@ async function createVideoTask(dataUri, prompt) {
   const jobId = d.id || d.job_id;
   if (!jobId) throw new Error('Pas de job ID');
   return jobId;
-}
-async function pollVideo(jobId, onProg) {
-  for (let a = 0; a < 60; a++) {
-    if (state.stopRequested) throw new Error('Arrêt demandé');
-    await sleep(5000);
-    onProg('Vidéo en cours… ' + (a * 5) + 's');
-    const r = await apiFetch(API_BASE + '/video-projects/' + jobId, {
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + getApiKey() }
-    });
-    const d = await r.json();
-    const st = d.status;
-    if (st === 'complete' || st === 'completed' || st === 'succeeded') {
-      const u = (d.downloads && d.downloads[0] && d.downloads[0].url) || d.url || d.output_url;
-      if (!u) throw new Error('Pas d\'URL');
-      return u;
-    }
-    if (st === 'error' || st === 'failed' || st === 'canceled') {
-      throw new Error('Échec : ' + ((d.error && d.error.message) || 'inconnu'));
-    }
-  }
-  throw new Error('Délai dépassé');
 }
 
 // ═══════════ QUEUE ═══════════

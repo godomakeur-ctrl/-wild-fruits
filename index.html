@@ -116,15 +116,11 @@ select:focus{outline:none;border-color:var(--leaf)}
 <strong>🌱 Bienvenue :</strong> Ajoute tes images (fruits, animaux, nature), choisis un effet et laisse l'IA animer. Format <strong>portrait 9:16</strong>.
 </div>
 
-<div class="api-panel" id="api-panel">
-<input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé Magic Hour ici (mhk_live_...)" autocomplete="off">
-<button type="button" class="api-save-btn" id="api-save-btn">🔑 Enregistrer la clé</button>
-<div class="api-status-line" id="api-status-line">
+<div class="api-panel ok" id="api-panel">
+<div class="api-status-line ok">
 <span class="status-dot"></span>
-<span id="api-status-text">Aucune clé API enregistrée</span>
+<span id="api-status-text">Clé API intégrée ✓</span>
 </div>
-<div class="api-hint">Clé sur <a href="https://magichour.ai/developer" target="_blank">magichour.ai/developer</a> → API Keys → Create New</div>
-<div class="stat-line"><span>📊 Vitesse : <span id="stat-speed">en attente</span></span><span id="stat-samples">0 génération</span></div>
 </div>
 
 <div class="upload-zone" id="upload-zone">
@@ -236,20 +232,18 @@ function saveApiKey(){
 }
 function updateApiPanel(){
   const p=document.getElementById('api-panel');
-  const sl=document.getElementById('api-status-line');
   const st=document.getElementById('api-status-text');
-  const i=document.getElementById('api-key-input');
   if(!p)return;
   const k=getApiKey();
   if(k){
-    p.classList.add('ok');sl.classList.add('ok');
-    st.textContent='Clé active · '+k.slice(0,12)+'…'+k.slice(-4);
-    if(i)i.value=k;
+    p.classList.add('ok');
+    st.textContent='Clé API intégrée ✓ ('+k.slice(0,12)+'…)';
   }else{
-    p.classList.remove('ok');sl.classList.remove('ok');
-    st.textContent='Aucune clé API';
+    p.classList.remove('ok');
+    st.textContent='⚠️ Clé API manquante dans le code';
   }
   updateGenerateBtn();
+}
 }
 function updateGenerateBtn(){
   const b=document.getElementById('generate-btn');
@@ -475,8 +469,7 @@ function stopGeneration(){if(!state.isRunning)return;state.stopRequested=true;se
 
 // ═══════════ INIT ═══════════
 (function init(){
-  const sb=document.getElementById('api-save-btn');
-  if(sb)sb.addEventListener('click',function(e){e.preventDefault();saveApiKey()});
+  // Bouton supprimé — la clé est dans le code
   const stb=document.getElementById('stop-btn');if(stb)stb.addEventListener('click',stopGeneration);
   const dlAll=document.getElementById('dl-all-btn');if(dlAll)dlAll.addEventListener('click',downloadAll);
 -toggle]').forEach(h=>h.addEventListener('click',()=>document.getElementById(h.dataset.toggle).classList.toggle('open')));

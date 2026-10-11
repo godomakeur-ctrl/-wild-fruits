@@ -475,14 +475,36 @@ async function uploadImage(dataUri) {
 }
 
 async function createVideoTask(dataUri, prompt) {
-  const fileId = await uploadImage(dataUri);
+  // Étape 1 : Uploader l'image
+  const blob = await (await fetch(dataUri)).blob();
+  const formData = new FormData();
+  formData.append('file', blob, 'image.jpg');
+  
+  const uploadRes = await fetch(API_BASE + '/files', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey() },
+    body: formData
+  });
+  
+  if (!uploadRes.ok) {
+    const e = await uploadRes.text();
+    throw new Error('Upload échoué : ' + e.slice(0, 200));
+  }
+  
+  const uploadData = await uploadRes.json();
+  const filePath = uploadData.id || uploadData.file_id || uploadData.path;
+  
+  // Étape 2 : Créer la vidéo avec le BON format
   const body = {
+    assets: {
+      image_file_path: filePath
+    },
+    end_seconds: state.durationSec,
     model: MODEL_VIDEO,
-    image_file_id: fileId,
-    prompt: prompt,
-    duration: state.durationSec,
-    resolution: '480p'
+    resolution: '480p',
+    name: 'Wild Fruits - ' + Date.now()
   };
+  
   const r = await apiFetch(API_BASE + '/image-to-video', {
     method: 'POST',
     headers: {
@@ -491,16 +513,17 @@ async function createVideoTask(dataUri, prompt) {
     },
     body: JSON.stringify(body)
   });
+  
   if (!r.ok) {
     const e = await r.text();
     throw new Error('HTTP ' + r.status + ' — ' + e.slice(0, 200));
   }
+  
   const d = await r.json();
   const jobId = d.id || d.job_id;
   if (!jobId) throw new Error('Pas de job ID');
   return jobId;
 }
-
 async function pollVideo(jobId, onProg) {
   for (let a = 0; a < 60; a++) {
     if (state.stopRequested) throw new Error('Arrêt demandé');

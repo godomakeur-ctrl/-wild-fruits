@@ -27,19 +27,8 @@ h1{font-size:1.7rem;font-weight:700;letter-spacing:.05em;margin-bottom:.3rem;bac
 .section-body{max-height:0;overflow:hidden;transition:max-height .3s}
 .section.open .section-body{max-height:5000px}
 .section-content{padding:0 1.1rem 1.1rem}
-.api-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;transition:border-color .3s}
-.api-panel.ok{border-color:var(--ok);box-shadow:0 0 20px rgba(34,197,94,.2)}
-.api-key-input{width:100%;padding:.85rem 1rem;border-radius:8px;border:1px solid var(--border);background:#050a06;color:var(--ink);font-family:ui-monospace,Menlo,monospace;font-size:.85rem;margin-bottom:.6rem}
-.api-key-input:focus{outline:none;border-color:var(--leaf)}
-.api-save-btn{width:100%;padding:.8rem 1.2rem;border-radius:8px;border:none;background:linear-gradient(135deg,var(--leaf),var(--gold));color:#0a1410;font-size:.9rem;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:.6rem}
-.api-save-btn:active{transform:scale(.98)}
-.api-status-line{font-size:.75rem;padding:.55rem .85rem;border-radius:6px;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;background:var(--panel2);color:var(--dim);transition:all .3s}
-.api-status-line.ok{background:#052a10;color:var(--ok);font-weight:600}
-.api-status-line .status-dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0}
-.api-status-line.ok .status-dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
-.api-hint{font-size:.72rem;color:var(--dim);margin-top:.4rem}
-.api-hint a{color:var(--leaf);text-decoration:underline}
-.stat-line{font-size:.72rem;color:var(--dim);margin-top:.5rem;padding:.4rem .6rem;background:var(--panel2);border-radius:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.3rem}
+.status-panel{background:var(--panel);border:1px solid var(--ok);border-radius:12px;padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;font-size:.78rem;color:var(--ok);font-weight:600}
+.status-dot{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);flex-shrink:0}
 .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:2rem 1rem;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:1rem;background:var(--panel)}
 .upload-zone:active{border-color:var(--leaf);background:var(--panel2)}
 .upload-zone.loading{pointer-events:none;opacity:.6}
@@ -78,11 +67,8 @@ select:focus{outline:none;border-color:var(--leaf)}
 .queue{margin-top:1rem}
 .queue-summary{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:.7rem .9rem;margin-bottom:.6rem;font-size:.78rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
 .queue-summary .progress-text{color:var(--leaf);font-weight:600}
-.queue-summary .eta-text{color:var(--dim)}
 .queue-item{display:flex;align-items:center;gap:.8rem;padding:.7rem .8rem;border-radius:8px;border:1px solid var(--border);margin-bottom:.4rem;background:var(--panel);font-size:.82rem}
-.queue-item.pending{opacity:.5}
-.queue-item.creating{border-color:var(--warn)}
-.queue-item.processing{border-color:var(--leaf);box-shadow:0 0 10px rgba(74,222,128,.2)}
+.queue-item.processing{border-color:var(--leaf)}
 .queue-item.done{border-color:var(--ok)}
 .queue-item.failed{border-color:var(--err)}
 .queue-item .q-icon{font-size:1rem;width:1.5rem;text-align:center;flex-shrink:0}
@@ -97,7 +83,6 @@ select:focus{outline:none;border-color:var(--leaf)}
 .gallery-item .g-footer{padding:.5rem .6rem;background:var(--panel);display:flex;justify-content:space-between;align-items:center;gap:.5rem}
 .gallery-item .g-caption{font-size:.7rem;color:var(--leaf);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gallery-item .g-dl-btn{background:linear-gradient(135deg,var(--leaf),var(--gold));color:#0a1410;border:none;padding:.35rem .7rem;border-radius:6px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
-.gallery-item .g-dl-btn:active{opacity:.7}
 .status-bar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#0a1a10,#050a06);border-top:1px solid var(--leaf);color:var(--ink);padding:.7rem 1rem;font-size:.78rem;display:flex;align-items:center;gap:.6rem;transform:translateY(100%);transition:transform .3s;z-index:100}
 .status-bar.visible{transform:translateY(0)}
 .status-bar .spinner{width:12px;height:12px;border:2px solid rgba(74,222,128,.3);border-top-color:var(--leaf);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
@@ -113,14 +98,12 @@ select:focus{outline:none;border-color:var(--leaf)}
 </header>
 
 <div class="info-banner">
-<strong>🌱 Bienvenue :</strong> Ajoute tes images (fruits, animaux, nature), choisis un effet et laisse l'IA animer. Format <strong>portrait 9:16</strong>.
+<strong>🌱 Bienvenue :</strong> Ajoute tes images (fruits, animaux, nature), écris ton prompt et laisse l'IA animer. Format <strong>portrait 9:16</strong>.
 </div>
 
-<div class="api-panel ok" id="api-panel">
-<div class="api-status-line ok">
+<div class="status-panel">
 <span class="status-dot"></span>
-<span id="api-status-text">Clé API intégrée ✓</span>
-</div>
+<span id="api-status-text">Chargement…</span>
 </div>
 
 <div class="upload-zone" id="upload-zone">
@@ -166,25 +149,15 @@ select:focus{outline:none;border-color:var(--leaf)}
 <div class="section-body">
 <div class="section-content">
 <div class="control-row">
-<label class="control-label">Durée (en secondes)</label>
-<select id="duration-select" style="margin-bottom:.5rem">
-<option value="5">5 secondes (recommandé)</option>
+<label class="control-label">Durée</label>
+<select id="duration-select">
+<option value="5" selected>5 secondes</option>
 <option value="10">10 secondes</option>
-</select>
-</div>
-<div class="control-row">
-<label class="control-label">Cadrage</label>
-<select id="framing-select">
-<option value="random">Aléatoire</option>
-<option value="close">Très serré</option>
-<option value="medium">Moyen</option>
-<option value="wide">Large</option>
 </select>
 </div>
 <div class="control-row">
 <label class="control-label">Intensité</label>
 <select id="intensity-select">
-<option value="random">Aléatoire</option>
 <option value="subtle">Subtile</option>
 <option value="moderate" selected>Modérée</option>
 <option value="strong">Forte</option>
@@ -211,276 +184,596 @@ select:focus{outline:none;border-color:var(--leaf)}
 <div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-text">Message</span></div>
 
 <script>
-// ═══════════ CONFIG ═══════════
-const API_BASE='https://api.magichour.ai/v1';
-const MODEL_VIDEO='ltx-2.5';
-const API_KEY_STORAGE='wildfruits_magichour_key';
+// ═══════════════════════════════════════════════════════════════════
+// 🔑 TA CLÉ API MAGIC HOUR — REMPLACE TACLE_ICI PAR TA CLÉ
+// ═══════════════════════════════════════════════════════════════════
+const API_KEY_HARDCODED = 'TACLE_ICI';
 
-// ═══════════ CLÉ API ═══════════
-let API_KEY_MEMORY='mhk_live_ZazGmdvbVr4s657biakpGapsUPflBXgMPgFrsosnXrChC5WKCMjDpVfjkdkcrVLo7rErst8eq6WZGDrS';
-function getApiKey(){try{const k=localStorage.getItem(API_KEY_STORAGE);if(k)return k.trim()}catch(e){}return API_KEY_MEMORY.trim()}
-function saveApiKey(){
-  const i=document.getElementById('api-key-input');
-  if(!i){alert('Champ introuvable');return}
-  const k=i.value.trim();
-  if(!k){alert('Tape d\'abord ta clé API');return}
-  if(!k.startsWith('mhk_')){if(!confirm('Ta clé ne commence pas par mhk_. Continuer ?'))return}
-  API_KEY_MEMORY=k;
-  try{localStorage.setItem(API_KEY_STORAGE,k)}catch(e){}
-  updateApiPanel();
-  showToast('Clé API enregistrée ✓','success',3000);
-}
-function updateApiPanel(){
-  const p=document.getElementById('api-panel');
-  const st=document.getElementById('api-status-text');
-  if(!p)return;
-  const k=getApiKey();
-  if(k){
-    p.classList.add('ok');
-    st.textContent='Clé API intégrée ✓ ('+k.slice(0,12)+'…)';
-  }else{
-    p.classList.remove('ok');
-    st.textContent='⚠️ Clé API manquante dans le code';
+// ═══════════ CONFIG ═══════════
+const API_BASE = 'https://api.magichour.ai/v1';
+const MODEL_VIDEO = 'ltx-2.5';
+
+// ═══════════ STATE ═══════════
+const state = {
+  images: [],
+  isRunning: false,
+  stopRequested: false,
+  queue: [],
+  completed: 0,
+  failed: 0,
+  selectedEffect: null,
+  mainPrompt: '',
+  intensity: 'moderate',
+  durationSec: 5,
+  isLoadingImages: false,
+  videos: []
+};
+
+// ═══════════ API KEY ═══════════
+function getApiKey() { return API_KEY_HARDCODED.trim(); }
+
+function checkApiKey() {
+  const k = getApiKey();
+  const st = document.getElementById('api-status-text');
+  if (!st) return;
+  if (k && k.length > 10 && k.startsWith('mhk_')) {
+    st.textContent = 'Clé API intégrée ✓ (' + k.slice(0, 12) + '…)';
+  } else if (!k || k === 'mhk_live_5833TO6Gj7hShlarHVbQJgodQ4RCnjpgoEcwp7oi3VZ3yE0i7nm2WlhSTutEDs9L0CxwOuPb8JECQrmi') {
+    st.textContent = '⚠️ Clé API manquante — modifie le code ligne API_KEY_HARDCODED';
+    st.parentElement.style.borderColor = 'var(--err)';
+    st.parentElement.style.color = 'var(--err)';
+  } else {
+    st.textContent = '⚠️ Clé API invalide (doit commencer par mhk_)';
+    st.parentElement.style.borderColor = 'var(--err)';
+    st.parentElement.style.color = 'var(--err)';
   }
   updateGenerateBtn();
 }
-}
-function updateGenerateBtn(){
-  const b=document.getElementById('generate-btn');
-  if(!b)return;
-  const hasImg=state.images.length>0,hasKey=!!getApiKey();
-  b.disabled=!hasImg||!hasKey||state.isRunning||state.isLoadingImages;
-  if(state.isLoadingImages)b.textContent='Chargement… ('+state.images.length+')';
-  else if(state.isRunning){const d=state.completed+state.failed;b.textContent='Création… ('+d+'/'+state.queue.length+')'}
-  else if(!hasKey)b.textContent='Ajoutez votre clé API';
-  else if(!hasImg)b.textContent='Ajoutez des images';
-  else b.textContent='🌿 Créer '+state.images.length+' vidéo'+(state.images.length>1?'s':'');
-}
 
 // ═══════════ TOAST ═══════════
-let toastTimeout=null;
-function showToast(msg,type='success',dur=2500){
-  const t=document.getElementById('toast'),i=document.getElementById('toast-icon'),x=document.getElementById('toast-text');
-  if(!t){alert(msg);return}
-  t.classList.remove('visible','success','error','warn');void t.offsetWidth;
-  i.textContent=({success:'✓',error:'✕',warn:'⚠'})[type]||'✓';
-  x.textContent=msg;t.classList.add(type);
-  requestAnimationFrame(()=>t.classList.add('visible'));
-  if(toastTimeout)clearTimeout(toastTimeout);
-  toastTimeout=setTimeout(()=>t.classList.remove('visible'),dur);
+let toastTimeout = null;
+function showToast(msg, type = 'success', dur = 2500) {
+  const t = document.getElementById('toast');
+  const i = document.getElementById('toast-icon');
+  const x = document.getElementById('toast-text');
+  if (!t) return;
+  t.classList.remove('visible', 'success', 'error', 'warn');
+  void t.offsetWidth;
+  i.textContent = ({ success: '✓', error: '✕', warn: '⚠' })[type] || '✓';
+  x.textContent = msg;
+  t.classList.add(type);
+  requestAnimationFrame(() => t.classList.add('visible'));
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('visible'), dur);
 }
 
-// ═══════════ TIMING ═══════════
-let timingCache={};
-function recordGenerationTime(n,d){const k=String(n);if(!timingCache[k])timingCache[k]=[];timingCache[k].push(d);updateTimingDisplay()}
-function estimateGenerationTime(){return 40000}
-function updateTimingDisplay(){const all=Object.values(timingCache).flat(),s=document.getElementById('stat-speed'),n=document.getElementById('stat-samples');if(!s)return;if(!all.length){s.textContent='en attente';n.textContent='0 génération';return}const avg=all.reduce((a,b)=>a+b,0)/all.length;s.textContent=(avg/1000).toFixed(1)+'s en moyenne';n.textContent=all.length+' génération'+(all.length>1?'s':'')}
+// ═══════════ UTILS ═══════════
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function log(m) { console.log('[WildFruits] ' + m); }
+function setStatus(t) {
+  const b = document.getElementById('status-bar');
+  const x = document.getElementById('status-text');
+  if (!b) return;
+  if (t) { b.classList.add('visible'); x.textContent = t; }
+  else b.classList.remove('visible');
+}
+function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+// ═══════════ UPDATE GENERATE BTN ═══════════
+function updateGenerateBtn() {
+  const b = document.getElementById('generate-btn');
+  if (!b) return;
+  const hasImg = state.images.length > 0;
+  const hasKey = !!getApiKey() && getApiKey() !== 'TACLE_ICI';
+  b.disabled = !hasImg || !hasKey || state.isRunning || state.isLoadingImages;
+  if (state.isLoadingImages) b.textContent = 'Chargement… (' + state.images.length + ')';
+  else if (state.isRunning) {
+    const d = state.completed + state.failed;
+    b.textContent = 'Création… (' + d + '/' + state.queue.length + ')';
+  } else if (!hasKey) b.textContent = '⚠️ Clé API manquante';
+  else if (!hasImg) b.textContent = 'Ajoutez des images';
+  else b.textContent = '🌿 Créer ' + state.images.length + ' vidéo' + (state.images.length > 1 ? 's' : '');
+}
 
 // ═══════════ PRESETS ═══════════
-const PROMPT_PRESETS=[
-{label:'😌 Réveil doux',text:'A silent animation. No dialogue, no voices, no text on screen. Eyes slowly open, then blink. Gentle head movement. Do not look at the camera. They look at each other.'},
-{label:'🍃 Vent dans les feuilles',text:'A silent animation. No dialogue, no voices, no text on screen. Leaves gently sway in a soft breeze. Light dappled through branches. Do not look at the camera.'},
-{label:'😲 Surprise',text:'A silent animation. No dialogue, no voices, no text on screen. Eyes wide open. Mouth slightly open in surprise. Do not look at the camera. They look at each other.'},
-{label:'🌸 Fleurs qui bougent',text:'A silent animation. No dialogue, no voices, no text on screen. Flowers sway gently. Petals float in the air. Do not look at the camera.'},
-{label:'🏃 Course',text:'A silent animation. No dialogue, no voices, no text on screen. Legs move fast. Arms swing. Hair blown back by wind. Do not look at the camera. They look forward.'},
-{label:'✨ Particules',text:'A silent animation. No dialogue, no voices, no text on screen. Golden dust particles float in the air. Light sparkles gently. Do not look at the camera.'},
-{label:'🌅 Coucher de soleil',text:'A silent animation. No dialogue, no voices, no text on screen. Warm golden sunlight shifts gently. Shadows move. Characters blink slowly. Do not look at the camera.'}
+const PROMPT_PRESETS = [
+  { label: '😌 Réveil doux', text: 'A silent animation. No dialogue, no voices, no text on screen. Eyes slowly open, then blink. Gentle head movement. Do not look at the camera.' },
+  { label: '🍃 Vent dans les feuilles', text: 'A silent animation. No dialogue, no voices, no text on screen. Leaves gently sway in a soft breeze. Light dappled through branches.' },
+  { label: '😲 Surprise', text: 'A silent animation. No dialogue, no voices, no text on screen. Eyes wide open. Mouth slightly open in surprise.' },
+  { label: '🌸 Fleurs qui bougent', text: 'A silent animation. No dialogue, no voices, no text on screen. Flowers sway gently. Petals float in the air.' },
+  { label: '🏃 Course', text: 'A silent animation. No dialogue, no voices, no text on screen. Legs move fast. Arms swing. Hair blown back by wind. Do not look at the camera.' },
+  { label: '✨ Particules', text: 'A silent animation. No dialogue, no voices, no text on screen. Golden dust particles float in the air. Light sparkles gently.' },
+  { label: '🌅 Coucher de soleil', text: 'A silent animation. No dialogue, no voices, no text on screen. Warm golden sunlight shifts gently. Shadows move.' }
 ];
 
-// ═══════════ EFFETS ═══════════
-const NATURE_EFFECTS=[
-{id:'leaf-wind',name:'Vent dans les feuilles',emoji:'🍃',desc:'Feuilles qui bougent',prompt:'gentle wind through green leaves, dappled sunlight through branches, fresh natural atmosphere.'},
-{id:'petals',name:'Pétales qui volent',emoji:'🌸',desc:'Fleurs et pétales',prompt:'flower petals floating in the air, soft spring breeze, colorful blossoms, gentle atmosphere.'},
-{id:'sunbeam',name:'Rayons de soleil',emoji:'☀️',desc:'Lumière dorée',prompt:'warm sunbeams through trees, golden hour light, dust particles floating in rays.'},
-{id:'forest',name:'Forêt magique',emoji:'🌲',desc:'Ambiance forêt',prompt:'deep magical forest atmosphere, soft green light, moss and ferns, floating fireflies.'},
-{id:'rain',name:'Pluie douce',emoji:'🌧️',desc:'Pluie et gouttes',prompt:'gentle rain falling, water droplets on leaves, wet fresh atmosphere, soft gray light.'},
-{id:'spring',name:'Printemps',emoji:'🌷',desc:'Couleurs printanières',prompt:'spring atmosphere, colorful flowers blooming, butterflies, bright fresh light.'},
-{id:'autumn',name:'Automne',emoji:'🍂',desc:'Feuilles dorées',prompt:'autumn atmosphere, falling golden leaves, warm orange and red tones, soft light.'},
-{id:'meadow',name:'Prairie',emoji:'🌾',desc:'Herbes et vent',prompt:'sunny meadow, tall grass swaying in gentle wind, wildflowers, blue sky.'},
-{id:'moonlight',name:'Clair de lune',emoji:'🌙',desc:'Bleu nocturne',prompt:'cool moonlight atmosphere, silver and blue tones, peaceful night, soft glow.'},
-{id:'sunrise',name:'Aube',emoji:'🌄',desc:'Premières lueurs',prompt:'dawn light, pink and pale blue sky tones, gentle awakening atmosphere.'},
-{id:'water',name:'Reflets d\'eau',emoji:'💧',desc:'Eau qui bouge',prompt:'water reflections, gentle ripples, sparkling light on the surface, fresh atmosphere.'},
-{id:'fireflies',name:'Lucioles',emoji:'✨',desc:'Petites lumières',prompt:'glowing fireflies at dusk, magical summer evening, soft golden points of light.'}
+// ═══════════ EFFECTS ═══════════
+const NATURE_EFFECTS = [
+  { id: 'leaf-wind', name: 'Vent dans les feuilles', emoji: '🍃', desc: 'Feuilles qui bougent', prompt: 'gentle wind through green leaves, dappled sunlight through branches.' },
+  { id: 'petals', name: 'Pétales qui volent', emoji: '🌸', desc: 'Fleurs et pétales', prompt: 'flower petals floating in the air, soft spring breeze, colorful blossoms.' },
+  { id: 'sunbeam', name: 'Rayons de soleil', emoji: '☀️', desc: 'Lumière dorée', prompt: 'warm sunbeams through trees, golden hour light, dust particles floating.' },
+  { id: 'forest', name: 'Forêt magique', emoji: '🌲', desc: 'Ambiance forêt', prompt: 'deep magical forest atmosphere, soft green light, floating fireflies.' },
+  { id: 'rain', name: 'Pluie douce', emoji: '🌧️', desc: 'Pluie et gouttes', prompt: 'gentle rain falling, water droplets on leaves, soft gray light.' },
+  { id: 'spring', name: 'Printemps', emoji: '🌷', desc: 'Couleurs printanières', prompt: 'spring atmosphere, colorful flowers blooming, butterflies.' },
+  { id: 'autumn', name: 'Automne', emoji: '🍂', desc: 'Feuilles dorées', prompt: 'autumn atmosphere, falling golden leaves, warm orange tones.' },
+  { id: 'meadow', name: 'Prairie', emoji: '🌾', desc: 'Herbes et vent', prompt: 'sunny meadow, tall grass swaying in gentle wind, wildflowers.' },
+  { id: 'moonlight', name: 'Clair de lune', emoji: '🌙', desc: 'Bleu nocturne', prompt: 'cool moonlight atmosphere, silver and blue tones, peaceful night.' },
+  { id: 'sunrise', name: 'Aube', emoji: '🌄', desc: 'Premières lueurs', prompt: 'dawn light, pink and pale blue sky tones, gentle awakening.' },
+  { id: 'water', name: 'Reflets d\'eau', emoji: '💧', desc: 'Eau qui bouge', prompt: 'water reflections, gentle ripples, sparkling light on the surface.' },
+  { id: 'fireflies', name: 'Lucioles', emoji: '✨', desc: 'Petites lumières', prompt: 'glowing fireflies at dusk, magical summer evening.' }
 ];
 
-const RANDOM_ACTIONS=[
-'the subject slowly raises a hand',
-'the subject turns their head slowly',
-'the subject\'s hair moves gently in an imperceptible breeze',
-'the subject stands still, only their chest rising and falling with breath',
-'the subject blinks slowly'
-];
-const RANDOM_CAMERA=[
-'slow dolly-in, camera gliding forward almost imperceptibly',
-'static locked-off frame, subject moves within fixed borders',
-'slow pan following the subject\'s movement',
-'subtle parallax movement revealing depth'
-];
-const RANDOM_LIGHTING=[
-'dramatic lighting with deep shadows',
-'warm golden glow',
-'cool mystical atmosphere',
-'cinematic rim lighting emphasizing the silhouette'
-];
-const INTENSITY_PRESETS={
-subtle:'very subtle movement, barely perceptible change',
-moderate:'moderate movement, clear but controlled motion',
-strong:'strong dynamic movement, energetic motion'
-};
-const FRAMING_PRESETS={
-close:'extreme close-up framing, tight on the subject',
-medium:'medium shot, subject framed from waist up',
-wide:'wide shot, subject framed with the environment visible'
+const INTENSITY_PRESETS = {
+  subtle: 'very subtle movement, barely perceptible change',
+  moderate: 'moderate movement, clear but controlled motion',
+  strong: 'strong dynamic movement, energetic motion'
 };
 
-// ═══════════ STATE ═══════════
-const state={images:[],isRunning:false,stopRequested:false,queue:[],completed:0,failed:0,selectedEffect:null,mainPrompt:'',framing:'random',intensity:'moderate',durationSec:5,isLoadingImages:false,videos:[]};
+// ═══════════ IMAGE HANDLING ═══════════
+function fileToDataUri(f) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = () => rej(new Error('Erreur'));
+    r.readAsDataURL(f);
+  });
+}
 
-// ═══════════ UTILS ═══════════
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-function log(m){console.log('[WildFruits] '+m)}
-function setStatus(t){const b=document.getElementById('status-bar'),x=document.getElementById('status-text');if(!b)return;if(t){b.classList.add('visible');x.textContent=t}else b.classList.remove('visible')}
-function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+function generateThumbnail(du) {
+  return new Promise(res => {
+    const i = new Image();
+    i.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        const ra = i.height / i.width;
+        c.width = 200;
+        c.height = Math.round(200 * ra);
+        c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', 0.7));
+      } catch (e) { res(du); }
+    };
+    i.onerror = () => res(du);
+    i.src = du;
+  });
+}
 
-// ═══════════ IMAGES ═══════════
-function fileToDataUri(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('Erreur'));r.readAsDataURL(f)})}
-function generateThumbnail(du){return new Promise(res=>{const i=new Image();i.onload=()=>{try{const c=document.createElement('canvas'),ra=i.height/i.width;c.width=200;c.height=Math.round(200*ra);c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.7))}catch(e){res(du)}};i.onerror=()=>res(du);i.src=du})}
-async function processOneFile(f){if(!f.type.startsWith('image/'))return null;if(f.size>12*1024*1024)return null;try{const du=await fileToDataUri(f),th=await generateThumbnail(du);return{file:f,dataUri:du,thumbnail:th,id:Date.now()+Math.random()}}catch(e){return null}}
-async function handleFiles(files){const arr=Array.from(files).filter(f=>f.type.startsWith('image/'));if(!arr.length)return;state.isLoadingImages=true;updateGenerateBtn();setStatus('Chargement…');for(const f of arr){const r=await processOneFile(f);if(r)state.images.push(r)}state.isLoadingImages=false;setStatus(null);renderImages();updateGenerateBtn()}
-function removeImage(id){state.images=state.images.filter(i=>i.id!==id);renderImages();updateGenerateBtn()}
-function renderImages(){const g=document.getElementById('images-grid');g.innerHTML=state.images.map(i=>'<div class="image-card"><img src="'+(i.thumbnail||i.dataUri)+'" alt=""><button class="remove-btn" data-remove="'+i.id+'">✕</button></div>').join('');g.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();removeImage(parseFloat(b.dataset.remove))}))}
+async function processOneFile(f) {
+  if (!f.type.startsWith('image/')) return null;
+  if (f.size > 12 * 1024 * 1024) return null;
+  try {
+    const du = await fileToDataUri(f);
+    const th = await generateThumbnail(du);
+    return { file: f, dataUri: du, thumbnail: th, id: Date.now() + Math.random() };
+  } catch (e) { return null; }
+}
 
-// ═══════════ RENDER ═══════════
-function renderPromptPresets(){const c=document.getElementById('prompt-presets');c.innerHTML=PROMPT_PRESETS.map((p,i)=>'<div class="prompt-preset" data-preset="'+i+'">'+esc(p.label)+'</div>').join('');c.querySelectorAll('.prompt-preset').forEach(el=>el.addEventListener('click',()=>{const p=PROMPT_PRESETS[parseInt(el.dataset.preset,10)];if(!p)return;const ta=document.getElementById('main-prompt');ta.value=p.text;state.mainPrompt=p.text;showToast('Exemple appliqué','success',1200)}))}
-function renderStyles(){const c=document.getElementById('styles-grid');let h='';h+='<div class="no-style-card '+(state.selectedEffect===null?'selected':'')+'" data-effect="none">'+(state.selectedEffect===null?'✓ Aucun effet':'🚫 Aucun effet')+'</div>';h+='<div class="style-cat-header">🌿 Ambiances nature</div>';h+=NATURE_EFFECTS.map(s=>'<div class="style-card '+(state.selectedEffect===s.id?'selected':'')+'" data-effect="'+s.id+'"><div class="style-emoji">'+s.emoji+'</div><div><div class="style-name">'+esc(s.name)+'</div><div class="style-desc">'+esc(s.desc)+'</div></div></div>').join('');c.innerHTML=h;c.querySelectorAll('[data-effect]').forEach(el=>el.addEventListener('click',()=>{const v=el.dataset.effect;state.selectedEffect=(v==='none')?null:v;renderStyles()}))}
+async function handleFiles(files) {
+  const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!arr.length) return;
+  state.isLoadingImages = true;
+  updateGenerateBtn();
+  setStatus('Chargement…');
+  for (const f of arr) {
+    const r = await processOneFile(f);
+    if (r) state.images.push(r);
+  }
+  state.isLoadingImages = false;
+  setStatus(null);
+  renderImages();
+  updateGenerateBtn();
+}
+
+function removeImage(id) {
+  state.images = state.images.filter(i => i.id !== id);
+  renderImages();
+  updateGenerateBtn();
+}
+
+function renderImages() {
+  const g = document.getElementById('images-grid');
+  g.innerHTML = state.images.map(i =>
+    '<div class="image-card"><img src="' + (i.thumbnail || i.dataUri) + '" alt=""><button class="remove-btn" data-remove="' + i.id + '">✕</button></div>'
+  ).join('');
+  g.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    removeImage(parseFloat(b.dataset.remove));
+  }));
+}
+
+// ═══════════ RENDER PRESETS ═══════════
+function renderPromptPresets() {
+  const c = document.getElementById('prompt-presets');
+  c.innerHTML = PROMPT_PRESETS.map((p, i) =>
+    '<div class="prompt-preset" data-preset="' + i + '">' + esc(p.label) + '</div>'
+  ).join('');
+  c.querySelectorAll('.prompt-preset').forEach(el => el.addEventListener('click', () => {
+    const p = PROMPT_PRESETS[parseInt(el.dataset.preset, 10)];
+    if (!p) return;
+    const ta = document.getElementById('main-prompt');
+    ta.value = p.text;
+    state.mainPrompt = p.text;
+    showToast('Exemple appliqué', 'success', 1200);
+  }));
+}
+
+function renderStyles() {
+  const c = document.getElementById('styles-grid');
+  let h = '';
+  h += '<div class="no-style-card ' + (state.selectedEffect === null ? 'selected' : '') + '" data-effect="none">' +
+    (state.selectedEffect === null ? '✓ Aucun effet' : '🚫 Aucun effet') +
+  '</div>';
+  h += '<div class="style-cat-header">🌿 Ambiances nature</div>';
+  h += NATURE_EFFECTS.map(s =>
+    '<div class="style-card ' + (state.selectedEffect === s.id ? 'selected' : '') + '" data-effect="' + s.id + '">' +
+      '<div class="style-emoji">' + s.emoji + '</div>' +
+      '<div><div class="style-name">' + esc(s.name) + '</div><div class="style-desc">' + esc(s.desc) + '</div></div>' +
+    '</div>'
+  ).join('');
+  c.innerHTML = h;
+  c.querySelectorAll('[data-effect]').forEach(el => el.addEventListener('click', () => {
+    const v = el.dataset.effect;
+    state.selectedEffect = (v === 'none') ? null : v;
+    renderStyles();
+  }));
+}
 
 // ═══════════ BUILD PROMPT ═══════════
-function buildPrompt(){const effect=state.selectedEffect?NATURE_EFFECTS.find(s=>s.id===state.selectedEffect):null;const hasUser=state.mainPrompt&&state.mainPrompt.trim().length>0;const parts=[];parts.push('Animate this exact image as the starting frame. Preserve the exact composition, framing, and layout. Only subtle motion, breathing, light, and atmosphere are animated. No dialogue, no speaking, no voices, no text on screen.');if(effect)parts.push(effect.prompt);if(hasUser)parts.push(state.mainPrompt.trim());if(state.framing!=='random'&&FRAMING_PRESETS[state.framing])parts.push(FRAMING_PRESETS[state.framing]);if(state.intensity!=='random'&&INTENSITY_PRESETS[state.intensity])parts.push(INTENSITY_PRESETS[state.intensity]);else parts.push(INTENSITY_PRESETS.moderate);parts.push(randomItem(RANDOM_ACTIONS));parts.push(randomItem(RANDOM_CAMERA));parts.push(randomItem(RANDOM_LIGHTING));parts.push('Portrait 9:16, 24fps, no watermarks');return parts.join('. ')}
+function buildPrompt() {
+  const effect = state.selectedEffect ? NATURE_EFFECTS.find(s => s.id === state.selectedEffect) : null;
+  const hasUser = state.mainPrompt && state.mainPrompt.trim().length > 0;
+  const parts = [];
+  parts.push('Animate this exact image as the starting frame. Preserve the exact composition, framing, and layout. Only subtle motion, breathing, light, and atmosphere are animated. No dialogue, no speaking, no voices, no text on screen.');
+  if (effect) parts.push(effect.prompt);
+  if (hasUser) parts.push(state.mainPrompt.trim());
+  if (INTENSITY_PRESETS[state.intensity]) parts.push(INTENSITY_PRESETS[state.intensity]);
+  parts.push('Portrait 9:16, no watermarks, no text');
+  return parts.join('. ');
+}
 
 // ═══════════ MAGIC HOUR API ═══════════
-async function apiFetch(url,opt,label){for(let a=0;a<5;a++){if(state.stopRequested)throw new Error('Arrêt demandé');try{const r=await fetch(url,opt);if(r.status===429){const w=[15,30,45,60,90][Math.min(a,4)];setStatus('Limite atteinte… ('+w+'s)');await sleep(w*1000);continue}return r}catch(e){if(e.message==='Arrêt demandé')throw e;const w=[3,5,8,12,20][Math.min(a,4)];setStatus('Connexion… ('+w+'s)');await sleep(w*1000)}}return fetch(url,opt)}
+async function apiFetch(url, opt) {
+  for (let a = 0; a < 5; a++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    try {
+      const r = await fetch(url, opt);
+      if (r.status === 429) {
+        const w = [15, 30, 45, 60, 90][Math.min(a, 4)];
+        setStatus('Limite atteinte… (' + w + 's)');
+        await sleep(w * 1000);
+        continue;
+      }
+      return r;
+    } catch (e) {
+      if (e.message === 'Arrêt demandé') throw e;
+      const w = [3, 5, 8, 12, 20][Math.min(a, 4)];
+      setStatus('Connexion… (' + w + 's)');
+      await sleep(w * 1000);
+    }
+  }
+  return fetch(url, opt);
+}
 
-async function uploadImage(dataUri){
-  const blob=await (await fetch(dataUri)).blob();
-  const formData=new FormData();
-  formData.append('file',blob,'image.jpg');
-  const r=await fetch(API_BASE+'/files',{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+getApiKey()},
-    body:formData
+async function uploadImage(dataUri) {
+  const blob = await (await fetch(dataUri)).blob();
+  const formData = new FormData();
+  formData.append('file', blob, 'image.jpg');
+  const r = await fetch(API_BASE + '/files', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey() },
+    body: formData
   });
-  if(!r.ok){const e=await r.text();throw new Error('Upload échoué : '+e.slice(0,200))}
-  const d=await r.json();
+  if (!r.ok) {
+    const e = await r.text();
+    throw new Error('Upload échoué : ' + e.slice(0, 200));
+  }
+  const d = await r.json();
   return d.id || d.file_id || d.path;
 }
 
-async function createVideoTask(dataUri,prompt){
-  const fileId=await uploadImage(dataUri);
-  const body={
-    model:MODEL_VIDEO,
-    image_file_id:fileId,
-    prompt:prompt,
-    duration:state.durationSec,
-    resolution:'480p'
+async function createVideoTask(dataUri, prompt) {
+  const fileId = await uploadImage(dataUri);
+  const body = {
+    model: MODEL_VIDEO,
+    image_file_id: fileId,
+    prompt: prompt,
+    duration: state.durationSec,
+    resolution: '480p'
   };
-  const r=await apiFetch(API_BASE+'/image-to-video',{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  },'Création');
-  if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — '+e.slice(0,200))}
-  const d=await r.json();
-  const jobId=d.id||d.job_id;
-  if(!jobId)throw new Error('Pas de job ID');
+  const r = await apiFetch(API_BASE + '/image-to-video', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + getApiKey(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const e = await r.text();
+    throw new Error('HTTP ' + r.status + ' — ' + e.slice(0, 200));
+  }
+  const d = await r.json();
+  const jobId = d.id || d.job_id;
+  if (!jobId) throw new Error('Pas de job ID');
   return jobId;
 }
 
-async function pollVideo(jobId,onProg){
-  for(let a=0;a<60;a++){
-    if(state.stopRequested)throw new Error('Arrêt demandé');
+async function pollVideo(jobId, onProg) {
+  for (let a = 0; a < 60; a++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
     await sleep(5000);
-    onProg('Vidéo en cours… '+(a*5)+'s');
-    const r=await apiFetch(API_BASE+'/video-projects/'+jobId,{
-      method:'GET',
-      headers:{'Authorization':'Bearer '+getApiKey()}
-    },'Polling');
-    const d=await r.json();
-    const st=d.status;
-    if(st==='complete'||st==='completed'||st==='succeeded'){
-      const u=(d.downloads&&d.downloads[0]&&d.downloads[0].url)||d.url||d.output_url;
-      if(!u)throw new Error('Pas d\'URL');
+    onProg('Vidéo en cours… ' + (a * 5) + 's');
+    const r = await apiFetch(API_BASE + '/video-projects/' + jobId, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + getApiKey() }
+    });
+    const d = await r.json();
+    const st = d.status;
+    if (st === 'complete' || st === 'completed' || st === 'succeeded') {
+      const u = (d.downloads && d.downloads[0] && d.downloads[0].url) || d.url || d.output_url;
+      if (!u) throw new Error('Pas d\'URL');
       return u;
     }
-    if(st==='error'||st==='failed'||st==='canceled'){
-      throw new Error('Échec : '+((d.error&&d.error.message)||'inconnu'));
+    if (st === 'error' || st === 'failed' || st === 'canceled') {
+      throw new Error('Échec : ' + ((d.error && d.error.message) || 'inconnu'));
     }
   }
   throw new Error('Délai dépassé');
 }
 
 // ═══════════ QUEUE ═══════════
-function renderQueue(){const q=document.getElementById('queue');if(!state.queue.length){q.style.display='none';return}q.style.display='block';const total=state.queue.length,done=state.completed+state.failed;let h='<div class="queue-summary"><span class="progress-text">Progression : '+done+'/'+total+'</span><span class="eta-text">'+(done<total?'en cours':'Terminé')+'</span></div>';h+=state.queue.slice(0,30).map(it=>{let ic='○',s='En attente',c='pending';if(it.status==='creating'){ic='◐';s='Préparation…';c='creating'}else if(it.status==='processing'){ic='◐';s=it.progress||'En cours…';c='processing'}else if(it.status==='done'){ic='●';s='Terminé';c='done'}else if(it.status==='failed'){ic='✕';s='Échec';c='failed'}return'<div class="queue-item '+c+'"><div class="q-icon">'+ic+'</div><div class="q-name">Image '+(it.imageIndex+1)+'</div><div class="q-status">'+esc(s)+'</div></div>'}).join('');q.innerHTML=h}
+function renderQueue() {
+  const q = document.getElementById('queue');
+  if (!state.queue.length) { q.style.display = 'none'; return; }
+  q.style.display = 'block';
+  const total = state.queue.length;
+  const done = state.completed + state.failed;
+  let h = '<div class="queue-summary"><span class="progress-text">Progression : ' + done + '/' + total + '</span></div>';
+  h += state.queue.slice(0, 30).map(it => {
+    let ic = '○', s = 'En attente', c = 'pending';
+    if (it.status === 'creating') { ic = '◐'; s = 'Préparation…'; c = 'creating'; }
+    else if (it.status === 'processing') { ic = '◐'; s = it.progress || 'En cours…'; c = 'processing'; }
+    else if (it.status === 'done') { ic = '●'; s = 'Terminé'; c = 'done'; }
+    else if (it.status === 'failed') { ic = '✕'; s = 'Échec'; c = 'failed'; }
+    return '<div class="queue-item ' + c + '"><div class="q-icon">' + ic + '</div><div class="q-name">Image ' + (it.imageIndex + 1) + '</div><div class="q-status">' + esc(s) + '</div></div>';
+  }).join('');
+  q.innerHTML = h;
+}
 
 // ═══════════ GALLERY ═══════════
-function addToGallery(url,label){state.videos.push({url:url,label:label,id:Date.now()+Math.random()});renderGallery()}
-function renderGallery(){const g=document.getElementById('gallery'),gr=document.getElementById('gallery-grid'),cnt=document.getElementById('gallery-count');if(!state.videos.length){g.style.display='none';return}g.style.display='block';if(cnt)cnt.textContent=state.videos.length;gr.innerHTML=state.videos.map(v=>'<div class="gallery-item"><video controls preload="metadata" muted playsinline><source src="'+v.url+'" type="video/mp4"></video><div class="g-footer"><div class="g-caption">'+esc(v.label)+'</div><button class="g-dl-btn" data-dl="'+v.id+'">⬇️ Télécharger</button></div></div>').join('');gr.querySelectorAll('[data-dl]').forEach(b=>{b.addEventListener('click',()=>downloadVideo(parseFloat(b.dataset.dl)))})}
-function downloadVideo(id){const v=state.videos.find(x=>x.id===id);if(!v){showToast('Vidéo introuvable','error');return}const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);if(isIOS){showToast('Appui long sur la vidéo → Enregistrer','success',4000);window.open(v.url,'_blank')}else{const a=document.createElement('a');a.href=v.url;a.download='wildfruits_'+Date.now()+'.mp4';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();document.body.removeChild(a)}}
-function downloadAll(){if(!state.videos.length){showToast('Aucune vidéo','warn');return}const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);if(isIOS){showToast('Ouvre chaque vidéo et fais un appui long','success',4000);window.open(state.videos[0].url,'_blank')}else{state.videos.forEach((v,i)=>{setTimeout(()=>{const a=document.createElement('a');a.href=v.url;a.download='wildfruits_'+i+'.mp4';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();document.body.removeChild(a)},i*800)})}}
+function addToGallery(url, label) {
+  state.videos.push({ url: url, label: label, id: Date.now() + Math.random() });
+  renderGallery();
+}
+
+function renderGallery() {
+  const g = document.getElementById('gallery');
+  const gr = document.getElementById('gallery-grid');
+  const cnt = document.getElementById('gallery-count');
+  if (!state.videos.length) { g.style.display = 'none'; return; }
+  g.style.display = 'block';
+  if (cnt) cnt.textContent = state.videos.length;
+  gr.innerHTML = state.videos.map(v =>
+    '<div class="gallery-item">' +
+      '<video controls preload="metadata" muted playsinline><source src="' + v.url + '" type="video/mp4"></video>' +
+      '<div class="g-footer">' +
+        '<div class="g-caption">' + esc(v.label) + '</div>' +
+        '<button class="g-dl-btn" data-dl="' + v.id + '">⬇️ Télécharger</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+  gr.querySelectorAll('[data-dl]').forEach(b => b.addEventListener('click', () => downloadVideo(parseFloat(b.dataset.dl))));
+}
+
+function downloadVideo(id) {
+  const v = state.videos.find(x => x.id === id);
+  if (!v) { showToast('Vidéo introuvable', 'error'); return; }
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    showToast('Appui long sur la vidéo → Enregistrer', 'success', 4000);
+    window.open(v.url, '_blank');
+  } else {
+    const a = document.createElement('a');
+    a.href = v.url;
+    a.download = 'wildfruits_' + Date.now() + '.mp4';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+}
+
+function downloadAll() {
+  if (!state.videos.length) { showToast('Aucune vidéo', 'warn'); return; }
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    showToast('Ouvre chaque vidéo et fais un appui long', 'success', 4000);
+    window.open(state.videos[0].url, '_blank');
+  } else {
+    state.videos.forEach((v, i) => {
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = v.url;
+        a.download = 'wildfruits_' + i + '.mp4';
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }, i * 800);
+    });
+  }
+}
 
 // ═══════════ PIPELINE ═══════════
-async function createTaskOnly(item){item.status='creating';item.progress='Préparation…';renderQueue();const prompt=buildPrompt();item.prompt=prompt;const vid=await createVideoTask(item.image.dataUri,prompt);item.videoId=vid;item.startTime=Date.now();item.status='processing';item.progress='En cours…';renderQueue();return vid}
-async function pollTaskAndDisplay(item){try{const url=await pollVideo(item.videoId,p=>{item.progress=p;renderQueue()});const el=Date.now()-item.startTime;recordGenerationTime (state.durationSec,el document);item.status='done';item.v.querySelectorideoUrl=url;item.progress='AllTerminé';state.completed++;renderQueue();updateGenerate('[Btn();addToGallery(urldata,'Image '+(item.imageIndex+1))}catch(e){if(e.message==='Arrêt demandé'){item.status='failed';item.progress='Arrêté'}else{item.status='failed';item.progress='Échec';state.failed++;log('Erreur: '+e.message)}renderQueue();updateGenerateBtn()}}
+async function createTaskOnly(item) {
+  item.status = 'creating';
+  item.progress = 'Préparation…';
+  renderQueue();
+  const prompt = buildPrompt();
+  item.prompt = prompt;
+  const vid = await createVideoTask(item.image.dataUri, prompt);
+  item.videoId = vid;
+  item.startTime = Date.now();
+  item.status = 'processing';
+  item.progress = 'En cours…';
+  renderQueue();
+  return vid;
+}
+
+async function pollTaskAndDisplay(item) {
+  try {
+    const url = await pollVideo(item.videoId, p => { item.progress = p; renderQueue(); });
+    item.status = 'done';
+    item.videoUrl = url;
+    item.progress = 'Terminé';
+    state.completed++;
+    renderQueue();
+    updateGenerateBtn();
+    addToGallery(url, 'Image ' + (item.imageIndex + 1));
+  } catch (e) {
+    if (e.message === 'Arrêt demandé') {
+      item.status = 'failed';
+      item.progress = 'Arrêté';
+    } else {
+      item.status = 'failed';
+      item.progress = 'Échec';
+      state.failed++;
+      log('Erreur: ' + e.message);
+    }
+    renderQueue();
+    updateGenerateBtn();
+  }
+}
 
 // ═══════════ WORKFLOW ═══════════
-async function startGeneration(){
-  if(state.isRunning||!state.images.length)return;
-  if(!getApiKey()){alert('Ajoutez votre clé API Magic Hour');return}
-  state.mainPrompt=document.getElementById('main-prompt').value.trim();
-  state.isRunning=true;state.stopRequested=false;
-  state.completed=0;state.failed=0;
-  state.queue=state.images.map((img,i)=>({imageIndex:i,image:img,status:'pending',progress:null,videoId:null,videoUrl:null,prompt:null,startTime:null}));
+async function startGeneration() {
+  if (state.isRunning || !state.images.length) return;
+  if (!getApiKey() || getApiKey() === 'TACLE_ICI') {
+    alert('La clé API est manquante dans le code.');
+    return;
+  }
+  state.mainPrompt = document.getElementById('main-prompt').value.trim();
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.completed = 0;
+  state.failed = 0;
+  state.queue = state.images.map((img, i) => ({
+    imageIndex: i,
+    image: img,
+    status: 'pending',
+    progress: null,
+    videoId: null,
+    videoUrl: null,
+    prompt: null,
+    startTime: null
+  }));
   document.getElementById('stop-btn').classList.add('visible');
-  document.getElementById('generate-btn').disabled=true;
-  renderQueue();updateGenerateBtn();
-  const totalStart=Date.now(),pollingTasks=[];
-  try{
-    for(let i=0;i<state.queue.length;i++){
-      if(state.stopRequested)break;
-      const item=state.queue[i];
-      try{await createTaskOnly(item);pollingTasks.push(pollTaskAndDisplay(item))}
-      catch(e){if(e.message==='Arrêt demandé')break;item.status='failed';item.progress='Échec';state.failed++;renderQueue();updateGenerateBtn()}
-      if(i<state.queue.length-1&&!state.stopRequested){
-        const w=15;
-        for(let r=w;r>0;r--){if(state.stopRequested)break;setStatus('Respiration… Image '+(i+2)+'/'+state.queue.length+' dans '+r+'s');await sleep(1000)}
+  document.getElementById('generate-btn').disabled = true;
+  renderQueue();
+  updateGenerateBtn();
+  const totalStart = Date.now();
+  const pollingTasks = [];
+  try {
+    for (let i = 0; i < state.queue.length; i++) {
+      if (state.stopRequested) break;
+      const item = state.queue[i];
+      try {
+        await createTaskOnly(item);
+        pollingTasks.push(pollTaskAndDisplay(item));
+      } catch (e) {
+        if (e.message === 'Arrêt demandé') break;
+        item.status = 'failed';
+        item.progress = 'Échec';
+        state.failed++;
+        renderQueue();
+        updateGenerateBtn();
+      }
+      if (i < state.queue.length - 1 && !state.stopRequested) {
+        for (let r = 15; r > 0; r--) {
+          if (state.stopRequested) break;
+          setStatus('Respiration… Image ' + (i + 2) + '/' + state.queue.length + ' dans ' + r + 's');
+          await sleep(1000);
+        }
       }
     }
-    if(pollingTasks.length){setStatus('Finalisation…');await Promise.allSettled(pollingTasks)}
-  }catch(e){log('Erreur: '+e.message)}
-  const el=(Date.now()-totalStart)/1000;
-  setStatus('✦ '+state.completed+'/'+state.queue.length+' vidéos en '+Math.round(el)+'s');
-  await sleep(4000);setStatus(null);
-  state.isRunning=false;state.stopRequested=false;
+    if (pollingTasks.length) {
+      setStatus('Finalisation…');
+      await Promise.allSettled(pollingTasks);
+    }
+  } catch (e) {
+    log('Erreur: ' + e.message);
+  }
+  const el = (Date.now() - totalStart) / 1000;
+  setStatus('✦ ' + state.completed + '/' + state.queue.length + ' vidéos en ' + Math.round(el) + 's');
+  await sleep(4000);
+  setStatus(null);
+  state.isRunning = false;
+  state.stopRequested = false;
   document.getElementById('stop-btn').classList.remove('visible');
   updateGenerateBtn();
-  showToast(state.completed+' vidéo(s) créée(s)','success');
+  showToast(state.completed + ' vidéo(s) créée(s)', 'success');
 }
-function stopGeneration(){if(!state.isRunning)return;state.stopRequested=true;setStatus('Arrêt en cours…')}
+
+function stopGeneration() {
+  if (!state.isRunning) return;
+  state.stopRequested = true;
+  setStatus('Arrêt en cours…');
+}
 
 // ═══════════ INIT ═══════════
-(function init(){
-  // Bouton supprimé — la clé est dans le code
-  const stb=document.getElementById('stop-btn');if(stb)stb.addEventListener('click',stopGeneration);
-  const dlAll=document.getElementById('dl-all-btn');if(dlAll)dlAll.addEventListener('click',downloadAll);
--toggle]').forEach(h=>h.addEventListener('click',()=>document.getElementById(h.dataset.toggle).classList.toggle('open')));
-  const uz=document.getElementById('upload-zone'),fi=document.getElementById('file-input');
-  if(uz&&fi){uz.addEventListener('click',()=>fi.click());fi.addEventListener('change',e=>{handleFiles(e.target.files);fi.value=''})}
-  const mp=document.getElementById('main-prompt');if(mp)mp.addEventListener('input',e=>{state.mainPrompt=e.target.value});
-  const ds=document.getElementById('duration-select');if(ds)ds.addEventListener('change',e=>{state.durationSec=parseInt(e.target.value,10)});
-  const fs=document.getElementById('framing-select');if(fs)fs.addEventListener('change',e=>{state.framing=e.target.value});
-  const is=document.getElementById('intensity-select');if(is)is.addEventListener('change',e=>{state.intensity=e.target.value});
-  const gb=document.getElementById('generate-btn');if(gb)gb.addEventListener('click',startGeneration);
-  updateApiPanel();updateTimingDisplay();renderPromptPresets();renderStyles();renderImages();renderQueue();
+(function init() {
+  // Bouton stop
+  const stb = document.getElementById('stop-btn');
+  if (stb) stb.addEventListener('click', stopGeneration);
+
+  // Bouton tout télécharger
+  const dlAll = document.getElementById('dl-all-btn');
+  if (dlAll) dlAll.addEventListener('click', downloadAll);
+
+  // Sections collapsibles
+  document.querySelectorAll('[data-toggle]').forEach(h => {
+    h.addEventListener('click', () => {
+      document.getElementById(h.dataset.toggle).classList.toggle('open');
+    });
+  });
+
+  // Upload
+  const uz = document.getElementById('upload-zone');
+  const fi = document.getElementById('file-input');
+  if (uz && fi) {
+    uz.addEventListener('click', () => fi.click());
+    fi.addEventListener('change', e => {
+      handleFiles(e.target.files);
+      fi.value = '';
+    });
+  }
+
+  // Prompt
+  const mp = document.getElementById('main-prompt');
+  if (mp) mp.addEventListener('input', e => { state.mainPrompt = e.target.value; });
+
+  // Durée
+  const ds = document.getElementById('duration-select');
+  if (ds) ds.addEventListener('change', e => { state.durationSec = parseInt(e.target.value, 10); });
+
+  // Intensité
+  const is = document.getElementById('intensity-select');
+  if (is) is.addEventListener('change', e => { state.intensity = e.target.value; });
+
+  // Bouton générer
+  const gb = document.getElementById('generate-btn');
+  if (gb) gb.addEventListener('click', startGeneration);
+
+  // Vérification clé + rendu
+  checkApiKey();
+  renderPromptPresets();
+  renderStyles();
+  renderImages();
+  renderQueue();
+  log('Prêt.');
 })();
 </script>
 </body>

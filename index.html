@@ -446,7 +446,8 @@ async function apiFetch(url, opt) {
       }
       return r;
     } catch (e) {
-      if (e.message === 'Arrêt demandé') throw e;
+item.progress = e.message;
+
       const w = [3, 5, 8, 12, 20][Math.min(a, 4)];
       setStatus('Connexion… (' + w + 's)');
       await sleep(w * 1000);

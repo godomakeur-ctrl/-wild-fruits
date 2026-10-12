@@ -516,6 +516,8 @@ async function createVideoTask(dataUri, prompt) {
   const body = {
     assets: {
       image_file_path: filePath
+      style: { prompt: prompt },
+
     },
     end_seconds: state.durationSec,
     resolution: '480p',
@@ -541,6 +543,28 @@ async function createVideoTask(dataUri, prompt) {
   if (!jobId) throw new Error('Pas de job ID');
   return jobId;
 }
+  async function pollVideo(id, onProgress) {
+  for (let i = 0; i < 120; i++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    const r = await apiFetch(API_BASE + '/video-projects/' + id, {
+      headers: { 'Authorization': 'Bearer ' + getApiKey() }
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (d.status === 'complete') {
+      const url = d.downloads && d.downloads[0] && d.downloads[0].url;
+      if (!url) throw new Error('Pas d\'URL de vidéo');
+      return url;
+    }
+    if (d.status === 'error' || d.status === 'canceled') {
+      throw new Error((d.error && d.error.message) || d.status);
+    }
+    onProgress('Statut : ' + d.status);
+    await sleep(5000);
+  }
+  throw new Error('Délai dépassé');
+}
+
 // ═══════════ QUEUE ═══════════
 function renderQueue() {
   const q = document.getElementById('queue');

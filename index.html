@@ -189,7 +189,7 @@ select:focus{outline:none;border-color:var(--leaf)}
 // 🔑 METS TA CLÉ AGNES AI ICI, À LA PLACE DE TACLE_ICI
 // (garde bien les deux guillemets simples et le point-virgule)
 // ═══════════════════════════════════════════════════════════════════
-const API_KEY_HARDCODED = 'sk-iIM1qtLB0itMbCDy3IYbZNekYiyuKUonyFb713hJAlJFyLM6';
+const API_KEY_HARDCODED = 'TACLE_ICI';
 
 // ═══════════ CONFIG ═══════════
 const API_BASE = 'https://apihub.agnes-ai.com';
@@ -282,13 +282,13 @@ function updateGenerateBtn() {
   const b = document.getElementById('generate-btn');
   if (!b) return;
   const hasImg = state.images.length > 0;
-  const hasKey = hasKey();
-  b.disabled = !hasImg || !hasKey || state.isRunning || state.isLoadingImages;
+  const keyOk = hasKey();
+  b.disabled = !hasImg || !keyOk || state.isRunning || state.isLoadingImages;
   if (state.isLoadingImages) b.textContent = 'Chargement… (' + state.images.length + ')';
   else if (state.isRunning) {
     const d = state.completed + state.failed;
     b.textContent = 'Création… (' + d + '/' + state.queue.length + ')';
-  } else if (!hasKey) b.textContent = '⚠️ Clé API manquante';
+  } else if (!keyOk) b.textContent = '⚠️ Clé API manquante';
   else if (!hasImg) b.textContent = 'Ajoutez des images';
   else b.textContent = '🌿 Créer ' + state.images.length + ' vidéo' + (state.images.length > 1 ? 's' : '');
 }

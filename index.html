@@ -499,7 +499,7 @@ async function createVideoTask(dataUri, prompt) {
   const uploadUrl = item.upload_url;
   const filePath = item.file_path;
   
-  // ÉTAPE 2 : Envoyer l'image à l'URL signée
+  // ÉTAPE 2 : Envoyer l'image à l'URL signée (PUT)
   const blob = await (await fetch(dataUri)).blob();
   const putRes = await fetch(uploadUrl, {
     method: 'PUT',
@@ -512,11 +512,13 @@ async function createVideoTask(dataUri, prompt) {
     throw new Error('Upload PUT échoué : ' + e.slice(0, 200));
   }
   
-  // ÉTAPE 3 : Créer la vidéo avec le file_path
+  // ÉTAPE 3 : Créer la vidéo avec le format EXACT de la doc
   const body = {
-    assets: { imageFilePath: filePath },
-    endSeconds: state.durationSec,
-    resolution: '720p',
+    assets: {
+      image_file_path: filePath
+    },
+    end_seconds: state.durationSec,
+    resolution: '480p',
     name: 'Wild Fruits - ' + Date.now()
   };
   
@@ -535,11 +537,10 @@ async function createVideoTask(dataUri, prompt) {
   }
   
   const d = await r.json();
-  const jobId = d.id || d.job_id;
+  const jobId = d.id;
   if (!jobId) throw new Error('Pas de job ID');
   return jobId;
 }
-
 // ═══════════ QUEUE ═══════════
 function renderQueue() {
   const q = document.getElementById('queue');

@@ -114,6 +114,7 @@ select:focus{outline:none;border-color:var(--leaf)}
 </div>
 
 <div class="images-grid" id="images-grid"></div>
+<div id="debug" style="font-size:.72rem;color:#7a9a80;margin-bottom:1rem;word-break:break-word;"></div>
 
 <div class="section open" id="section-prompt">
 <div class="section-header" data-toggle="section-prompt">
@@ -188,7 +189,7 @@ select:focus{outline:none;border-color:var(--leaf)}
 // 🔑 METS TA CLÉ AGNES AI ICI, À LA PLACE DE TACLE_ICI
 // (garde bien les deux guillemets simples et le point-virgule)
 // ═══════════════════════════════════════════════════════════════════
-const API_KEY_HARDCODED = 'sk-iIM1qtLB0itMbCDy3IYbZNekYiyuKUonyFb713hJAlJFyLM6';
+const API_KEY_HARDCODED = 'TACLE_ICI';
 
 // ═══════════ CONFIG ═══════════
 const API_BASE = 'https://apihub.agnes-ai.com';
@@ -212,17 +213,31 @@ const state = {
 };
 
 // ═══════════ API KEY ═══════════
-function getApiKey() { return API_KEY_HARDCODED.trim(); }
+function getApiKey() {
+  let k = '';
+  try { k = (localStorage.getItem('wf_key') || '').trim(); } catch (e) {}
+  return k || API_KEY_HARDCODED.trim();
+}
+function askKey() {
+  const v = prompt('Colle ta clé API Agnes :');
+  if (v && v.trim()) {
+    try { localStorage.setItem('wf_key', v.trim()); } catch (e) {}
+    checkApiKey();
+  }
+}
 
 function checkApiKey() {
   const st = document.getElementById('api-status-text');
   if (!st) return;
+  const p = st.parentElement;
   if (hasKey()) {
-    st.textContent = 'Clé API Agnes intégrée ✓';
+    st.textContent = 'Clé API Agnes intégrée ✓ (touche ici pour la changer)';
+    p.style.borderColor = '';
+    p.style.color = '';
   } else {
-    st.textContent = '⚠️ Clé API manquante — modifie la ligne API_KEY_HARDCODED dans le code';
-    st.parentElement.style.borderColor = 'var(--err)';
-    st.parentElement.style.color = 'var(--err)';
+    st.textContent = '⚠️ Clé API manquante — touche ici pour l\'entrer';
+    p.style.borderColor = 'var(--err)';
+    p.style.color = 'var(--err)';
   }
   updateGenerateBtn();
 }
@@ -247,6 +262,7 @@ function showToast(msg, type = 'success', dur = 2500) {
 // ═══════════ UTILS ═══════════
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function log(m) { console.log('[WildFruits] ' + m); }
+function dbg(m) { const d = document.getElementById('debug'); if (d) d.textContent = m; }
 function setStatus(t) {
   const b = document.getElementById('status-bar');
   const x = document.getElementById('status-text');
@@ -351,6 +367,7 @@ async function processOneFile(f) {
     const th = await generateThumbnail(du);
     return { file: f, dataUri: du, thumbnail: th, id: Date.now() + Math.random() };
   } catch (e) {
+    dbg('Erreur image : ' + (e && e.message ? e.message : e));
     showToast('Image illisible : ' + (f.name || ''), 'error', 4000);
     return null;
   }
@@ -371,6 +388,7 @@ async function handleFiles(files) {
   setStatus(null);
   renderImages();
   updateGenerateBtn();
+  dbg('Images prêtes : ' + state.images.length);
   if (state.images.length === before) showToast('Aucune image ajoutée. Essaie un JPG ou PNG.', 'warn', 4000);
 }
 
@@ -738,6 +756,9 @@ function stopGeneration() {
 
 // ═══════════ INIT ═══════════
 (function init() {
+  window.addEventListener('error', ev => dbg('Erreur script : ' + ev.message));
+  const sp = document.querySelector('.status-panel');
+  if (sp) { sp.style.cursor = 'pointer'; sp.addEventListener('click', askKey); }
   const stb = document.getElementById('stop-btn');
   if (stb) stb.addEventListener('click', stopGeneration);
 
@@ -755,8 +776,9 @@ function stopGeneration() {
   if (uz && fi) {
     uz.addEventListener('click', () => fi.click());
     fi.addEventListener('change', e => {
-      handleFiles(e.target.files);
-      fi.value = '';
+      const fl = Array.from(e.target.files || []);
+      dbg('Fichiers reçus : ' + fl.length + ' ' + fl.map(f => (f.name || '?') + ' [' + (f.type || 'type ?') + ', ' + Math.round(f.size / 1024) + ' Ko]').join(' ; '));
+      handleFiles(fl).finally(() => { fi.value = ''; });
     });
   }
 

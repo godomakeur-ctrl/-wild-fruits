@@ -473,31 +473,48 @@ async function uploadImage(dataUri) {
 }
 
 async function createVideoTask(dataUri, prompt) {
-  // Étape 1 : Uploader l'image pour obtenir un chemin
-  const blob = await (await fetch(dataUri)).blob();
-  const formData = new FormData();
-  formData.append('file', blob, 'image.jpg');
+  const apiKey = getApiKey();
   
-  const uploadRes = await fetch(API_BASE + '/files', {
+  // ÉTAPE 1 : Demander une URL d'upload signée
+  const urlRes = await fetch(API_BASE + '/files/upload-urls', {
     method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + getApiKey() },
-    body: formData
+    headers: {
+      'Authorization': 'Bearer ' + apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      items: [{ type: 'image', extension: 'jpg' }]
+    })
   });
   
-  if (!uploadRes.ok) {
-    const e = await uploadRes.text();
-    throw new Error('Upload échoué : ' + e.slice(0, 200));
+  if (!urlRes.ok) {
+    const e = await urlRes.text();
+    throw new Error('URL upload échouée : ' + e.slice(0, 200));
   }
   
-  const uploadData = await uploadRes.json();
-  const filePath = uploadData.path || uploadData.file_path || uploadData.url || uploadData.id;
-  if (!filePath) throw new Error('Pas de chemin d\'image retourné : ' + JSON.stringify(uploadData).slice(0,200));
+  const urlData = await urlRes.json();
+  const item = urlData.items && urlData.items[0];
+  if (!item) throw new Error('Pas d\'URL retournée');
   
-  // Étape 2 : Créer la vidéo avec le BON format (camelCase)
+  const uploadUrl = item.upload_url;
+  const filePath = item.file_path;
+  
+  // ÉTAPE 2 : Envoyer l'image à l'URL signée
+  const blob = await (await fetch(dataUri)).blob();
+  const putRes = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'image/jpeg' },
+    body: blob
+  });
+  
+  if (!putRes.ok) {
+    const e = await putRes.text();
+    throw new Error('Upload PUT échoué : ' + e.slice(0, 200));
+  }
+  
+  // ÉTAPE 3 : Créer la vidéo avec le file_path
   const body = {
-    assets: {
-      imageFilePath: filePath
-    },
+    assets: { imageFilePath: filePath },
     endSeconds: state.durationSec,
     resolution: '720p',
     name: 'Wild Fruits - ' + Date.now()
@@ -506,7 +523,7 @@ async function createVideoTask(dataUri, prompt) {
   const r = await apiFetch(API_BASE + '/image-to-video', {
     method: 'POST',
     headers: {
-      'Authorization': 'Bearer ' + getApiKey(),
+      'Authorization': 'Bearer ' + apiKey,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(body)

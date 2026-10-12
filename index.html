@@ -475,7 +475,7 @@ async function uploadImage(dataUri) {
 }
 
 async function createVideoTask(dataUri, prompt) {
-  // Étape 1 : Uploader l'image
+  // Étape 1 : Uploader l'image pour obtenir un chemin
   const blob = await (await fetch(dataUri)).blob();
   const formData = new FormData();
   formData.append('file', blob, 'image.jpg');
@@ -492,16 +492,16 @@ async function createVideoTask(dataUri, prompt) {
   }
   
   const uploadData = await uploadRes.json();
-  const filePath = uploadData.id || uploadData.file_id || uploadData.path;
+  const filePath = uploadData.path || uploadData.file_path || uploadData.url || uploadData.id;
+  if (!filePath) throw new Error('Pas de chemin d\'image retourné : ' + JSON.stringify(uploadData).slice(0,200));
   
-  // Étape 2 : Créer la vidéo avec le BON format
+  // Étape 2 : Créer la vidéo avec le BON format (camelCase)
   const body = {
     assets: {
-      image_file_path: filePath
+      imageFilePath: filePath
     },
-    end_seconds: state.durationSec,
-    model: 'ltx-2.5',
-    resolution: '480p',
+    endSeconds: state.durationSec,
+    resolution: '720p',
     name: 'Wild Fruits - ' + Date.now()
   };
   
@@ -516,7 +516,7 @@ async function createVideoTask(dataUri, prompt) {
   
   if (!r.ok) {
     const e = await r.text();
-    throw new Error('HTTP ' + r.status + ' — ' + e.slice(0, 200));
+    throw new Error('HTTP ' + r.status + ' — ' + e.slice(0, 300));
   }
   
   const d = await r.json();
